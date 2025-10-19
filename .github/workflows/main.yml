@@ -43,6 +43,7 @@ jobs:
       run: |
         pip install buildozer
         pip install cython
+        pip install pillow
         
     - name: Set up Android SDK and NDK
       run: |
@@ -87,7 +88,7 @@ jobs:
         # 设置环境变量
         export ANDROID_HOME=$HOME/android-sdk
         export ANDROID_SDK_ROOT=$ANDROID_HOME
-        export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/33.0.0:$ANDROID_HOME/build-tools/36.1.0
+        export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/33.0.0
         
         # 验证环境变量
         echo "ANDROID_HOME: $ANDROID_HOME"
@@ -101,13 +102,6 @@ jobs:
           ls -la $ANDROID_HOME/build-tools/33.0.0
         else
           echo "Build tools 33.0.0 directory not found"
-        fi
-        
-        if [ -d "$ANDROID_HOME/build-tools/36.1.0" ]; then
-          echo "Build tools 36.1.0 directory found"
-          ls -la $ANDROID_HOME/build-tools/36.1.0
-        else
-          echo "Build tools 36.1.0 directory not found"
         fi
         
         cd android_client/files
