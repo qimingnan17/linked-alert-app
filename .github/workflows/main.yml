@@ -28,10 +28,13 @@ jobs:
           wget \
           unzip \
           openjdk-8-jdk \
-          zlib1g-dev
+          zlib1g-dev \
+          cython3
           
-    - name: Install buildozer
-      run: pip install buildozer
+    - name: Install Python dependencies
+      run: |
+        pip install buildozer
+        pip install cython
       
     - name: Build Android APK
       run: |
