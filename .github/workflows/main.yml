@@ -1,0 +1,62 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          git \
+          wget \
+          unzip \
+          openjdk-8-jdk \
+          zlib1g-dev
+          
+    - name: Install buildozer
+      run: pip install buildozer
+      
+    - name: Build Android APK
+      run: |
+        cd android_client/files
+        buildozer -v android debug
+        
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-apk
+        path: android_client/files/bin/*.apk
+        retention-days: 30
+        
+    - name: Create Release
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: softprops/action-gh-release@v1
+      with:
+        files: android_client/files/bin/*.apk
+        tag_name: v${{ github.run_number }}
+        name: Release v${{ github.run_number }}
+        body: |
+          自动构建的Android APK文件
+          
+          - 构建编号: ${{ github.run_number }}
+          - 提交: ${{ github.sha }}
+          - 触发者: ${{ github.actor }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
