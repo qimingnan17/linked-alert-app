@@ -33,13 +33,11 @@ jobs:
           autoconf \
           libtool \
           pkg-config \
-          zlib1g-dev \
-          libncurses5-dev \
-          libncursesw5-dev \
-          libtinfo5 \
           cmake \
           libffi-dev \
-          libssl-dev
+          libssl-dev \
+          libncurses5-dev \
+          libncursesw5-dev
           
     - name: Install Python dependencies
       run: |
