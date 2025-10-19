@@ -27,20 +27,30 @@ jobs:
           git \
           wget \
           unzip \
-          openjdk-8-jdk \
+          openjdk-11-jdk \
           zlib1g-dev \
-          cython3
+          cython3 \
+          autoconf \
+          libtool \
+          pkg-config \
+          zlib1g-dev \
+          libncurses5-dev \
+          libncursesw5-dev \
+          libtinfo5 \
+          cmake \
+          libffi-dev \
+          libssl-dev
           
     - name: Install Python dependencies
       run: |
         pip install buildozer
         pip install cython
         
-    - name: Set up Android SDK
+    - name: Set up Android SDK and NDK
       run: |
-        # 设置Android SDK环境变量
+        # 创建Android SDK目录
         export ANDROID_HOME=$HOME/android-sdk
-        export PATH=$PATH:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
+        mkdir -p $ANDROID_HOME
         
         # 下载并安装Android SDK命令行工具
         wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
@@ -48,22 +58,27 @@ jobs:
         unzip -q commandlinetools-linux-9477386_latest.zip -d $ANDROID_HOME/cmdline-tools/
         mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
         
+        # 设置环境变量
+        export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
+        
         # 接受Android SDK许可证
         yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
         
         # 安装必要的Android SDK组件
         $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
         
-        # 验证安装
-        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --list
+        # 验证AIDL工具是否可用
+        which aidl && echo "AIDL found successfully" || echo "AIDL not found, will use buildozer auto-download"
         
     - name: Build Android APK
       run: |
-        # 设置Android SDK环境变量
+        # 设置环境变量
         export ANDROID_HOME=$HOME/android-sdk
-        export PATH=$PATH:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
+        export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
         
         cd android_client/files
+        
+        # 让buildozer自动下载缺失的工具
         buildozer -v android debug
         
     - name: Upload APK artifact
